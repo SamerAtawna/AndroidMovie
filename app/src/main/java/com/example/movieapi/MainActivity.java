@@ -3,6 +3,8 @@ package com.example.movieapi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -23,9 +25,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     ImageButton btn;
+    ImageButton btn2;
     private ProgressBar progressBar;
     TextView txt;
     Integer count = 1;
@@ -38,22 +43,27 @@ public class MainActivity extends AppCompatActivity {
     TextView actors;
     TextView genere;
     ImageView img;
+    db movieDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        movieDatabase = new db(this);
+        List<movie> moviesList = movieDatabase.getMovies();
+
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setMax(10);
         btn = (ImageButton) findViewById(R.id.btnSearch);
+        btn2 = (ImageButton) findViewById(R.id.showMovies);
         txt = (TextView) findViewById(R.id.inputSearch);
-        title = (TextView)findViewById(R.id.mTitle);
-        year = (TextView)findViewById(R.id.mYear);
-        release = (TextView)findViewById(R.id.mReleased);
-        genere = (TextView)findViewById(R.id.mGenere);
-        actors = (TextView)findViewById(R.id.mActors);
-        runtime = (TextView)findViewById(R.id.mRunTime);
-        img = (ImageView)findViewById(R.id.poster);
+        title = (TextView) findViewById(R.id.mTitle);
+        year = (TextView) findViewById(R.id.mYear);
+        release = (TextView) findViewById(R.id.mReleased);
+        genere = (TextView) findViewById(R.id.mGenere);
+        actors = (TextView) findViewById(R.id.mActors);
+        runtime = (TextView) findViewById(R.id.mRunTime);
+        img = (ImageView) findViewById(R.id.poster);
 
         View.OnClickListener listener = new View.OnClickListener() {
             public void onClick(View view) {
@@ -66,10 +76,15 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.btnSearch:
                         new MyTask().execute("http://www.omdbapi.com/?apikey=4431e799&t=" + txt.getText());
                         break;
+                    case R.id.showMovies:
+                        Intent intent = new Intent(getApplicationContext(),MoviesList.class);
+                        startActivity(intent);
+                        break;
                 }
             }
         };
         btn.setOnClickListener(listener);
+        btn2.setOnClickListener(listener);
     }
 
     class MyTask extends AsyncTask<String, Integer, String> {// get movie
@@ -144,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 runtime.setText(obj.getString("Runtime"));
                 new DownloadImageTask((ImageView) findViewById(R.id.poster))
                         .execute(obj.getString("Poster"));
+                movieDatabase.addMovie(new movie(obj.getString("Title"), obj.getString("Year")));
 
 
             } catch (Throwable t) {
@@ -158,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setProgress(values[0]);
         }
     }
+
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
 
