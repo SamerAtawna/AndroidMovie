@@ -7,6 +7,8 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Movie;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,7 +30,7 @@ public class db extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE + "("
-                + KEY_TITLE  + " TEXT," + KEY_YEAR+ " TEXT)";
+                + KEY_TITLE + " TEXT," + KEY_YEAR + " TEXT)";
         db.execSQL(createTable);
     }
 
@@ -40,20 +42,20 @@ public class db extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    void addMovie(movie mov){
+    void addMovie(movie mov) {
         SQLiteDatabase d = this.getReadableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_TITLE,mov.getTitle());
-        values.put(KEY_YEAR,mov.getYear());
+        values.put(KEY_TITLE, mov.getTitle());
+        values.put(KEY_YEAR, mov.getYear());
         // Inserting Row
         d.insert(TABLE, null, values);
         //2nd argument is String containing nullColumnHack
         d.close(); // Closing database connection
     }
 
-    public List<movie> getMovies(){
-        List<movie> movieList= new ArrayList<movie>();
-        String query = "SELECT * FROM "+TABLE;
+    public List<movie> getMovies() {
+        List<movie> movieList = new ArrayList<movie>();
+        String query = "SELECT * FROM " + TABLE;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
@@ -67,6 +69,13 @@ public class db extends SQLiteOpenHelper {
 
         // return contact list
         return movieList;
+
+    }
+
+    public void deleteMovie(String moveName) {
+        SQLiteDatabase d = this.getWritableDatabase();
+        Log.e("delete", "deleted");
+        d.delete("MoviesList", "year=?", new String[]{moveName});
 
     }
 }
