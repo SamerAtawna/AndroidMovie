@@ -72,10 +72,12 @@ public class db extends SQLiteOpenHelper {
 
     }
 
-    public void deleteMovie(String moveName) {
+    public void deleteMovie(String moveName, MoviesAdapter ref) {
+        Log.d("ssawawa",moveName);
         SQLiteDatabase d = this.getWritableDatabase();
         Log.e("delete", "deleted");
         d.delete("MoviesList", "year=?", new String[]{moveName});
 
+//        d.execSQL("delete from MoviesList where title='"+moveName+"'");
     }
 }
