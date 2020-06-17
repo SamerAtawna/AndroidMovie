@@ -22,6 +22,7 @@ public class db extends SQLiteOpenHelper {
     private static final String TABLE = "MoviesList";
     private static final String KEY_TITLE = "title";
     private static final String KEY_YEAR = "year";
+    private static final String KEY_FAV = "fav";
 
     public db(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,8 +30,7 @@ public class db extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TABLE + "("
-                + KEY_TITLE + " TEXT," + KEY_YEAR + " TEXT)";
+        String createTable = "CREATE TABLE " + TABLE + "("+ KEY_TITLE + " TEXT," + KEY_YEAR + " TEXT," + KEY_FAV + " TEXT)";
         db.execSQL(createTable);
     }
 
@@ -77,6 +77,16 @@ public class db extends SQLiteOpenHelper {
         SQLiteDatabase d = this.getWritableDatabase();
         Log.e("delete", "deleted");
         d.delete("MoviesList", "year=?", new String[]{moveName});
+
+//        d.execSQL("delete from MoviesList where title='"+moveName+"'");
+    }
+
+    public void setFav(String moveName) {
+        SQLiteDatabase d = this.getWritableDatabase();
+        Log.e("FAV ###", "FAV");
+        ContentValues cv = new ContentValues();
+        cv.put("fav","1");
+        d.update("MoviesList",cv,"title="+moveName,null);
 
 //        d.execSQL("delete from MoviesList where title='"+moveName+"'");
     }
